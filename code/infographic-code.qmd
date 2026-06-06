@@ -31,14 +31,13 @@ Data last updated on May 29, 2026.
 
 ### Cleaning data
 
-ignore below for now
 ```{r}
-# created a new object from rxntime
-rxntime_clean <- rxntime |>
+# created a new object from pie
+pie_clean <- pie |>
   # cleaned column names
   clean_names() |> 
   # selected columns of interest
-  select(exercise_type, reaction_time_avg_ms, social_interaction) |> 
+  select(exercise_type, social_interaction, count) |> 
   # changed existing abbreviations
   mutate(social_interaction = case_when(
     social_interaction == "y" ~ "Yes",
@@ -51,11 +50,19 @@ rxntime_clean <- rxntime |>
 ### Visualization
 
 ```{r}
-rxntime_pie <- as.data.frame(rxntime_clean); rxntime_pie
+piee <- as.data.frame(pie_clean); piee
   group_by(exercise_type, social_interaction)
 
-PieDonut(data = rxntime_pie,
-         aes(exercise_type, social_interaction, count = n))
+# created a pie donut chart using the webr package and pie_clean df
+PieDonut(data = pie_clean,
+         # pie slices by exercise type, outlined by social interaction
+         aes(exercise_type, social_interaction, count = count),
+         # outer circle of the pie adds up to 100%
+         r0 = 0.5, # inner ring thickness
+         r1 = 1, # outer ring thickness
+         ratioByGroup = FALSE,
+         title = "Social Interaction Percentage by Exercise Type",
+         )
 ```
 
 ## Strip plot
