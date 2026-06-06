@@ -1,6 +1,6 @@
 ---
 title: "ENVS 193DS Infographic"
-date: "May 27, 2026" 
+date: "June 6, 2026" 
 author: "Danielle Sur" 
 format: pdf 
 editor: source
@@ -14,142 +14,96 @@ editor: source
 # loaded in packages
 library(tidyverse)
 library(janitor)
+library(here)
+library(webr)
 
 # read in data and saved as object called `rxntime`
-rxntime <- read_csv("rxn-time.csv")
+rxntime <- read_csv("data/rxn-time.csv")
 ```
 
+Data last updated on May 27, 2026.
 
-# Part 3. Code your visualizations
+# Part 3. Visualizing data
 
-## a. Set up your repository
+## a. Cleaning data
 
 ```{r}
-# created a new object from halibut data frame
-halibut_summary <- halibut |> 
-  # grouped by treatment type
-  group_by(ca_region) |> 
-  # calculated values for each region
-  summarize(
-    # summary for parametric test
-    mean = mean(landings_lb), # mean
-    n = length(landings_lb), # number of observations (n)
-    sd = sd(landings_lb), # standard deviation
-    # summary for non-parametric test
-    count = n(), # count
-    median = median(landings_lb), # median
-    IQR = IQR(landings_lb) # interquartile range
-  )
-
-# display of data frame
-halibut_summary
+rxntime_clean <- rxntime |> 
+  clean_names()
 ```
 
-### Strip plot for Welch's two-sample t-test
+### Pie chart
+
+```{r}
+
+```
+
+### Strip plot
+
+```{r}
+
+```
+
+### Timeseries plot
 
 ```{r}
 # base layer: ggplot
-ggplot(data = halibut_summary,
-       # x-axis: region
-       # y-axis: mean
-       mapping = aes(x = ca_region,
-                     y = mean,
-                     color = ca_region)) +
-  # added bars for standard deviation
-  geom_errorbar(mapping = aes(ymin = mean - sd,
-                              ymax = mean + sd,
-                              width = 0.1)) +
-  # relabeled axes titles
-  labs(x = "Region of California",
-       y = "Landings (lb)") +
-  # custom theme
-  theme_minimal() +
-  # removed legend
-  theme(legend.position = "none") +
-  # raw individual data points (jitter with horizontal break)
-  # x-axis: region
-  # y-axis: landing weight
-  geom_jitter(data = halibut,
-            mapping = aes(x = ca_region,
-                          y = landings_lb,
-                          color = ca_region),
-            width = 0.2,
-            height = 0,
-            size = 1.75,
-            alpha = 0.5,
-            shape = 18) +
-  # added points for the means
-  geom_point(size = 3,
-             color = "red") +
+ggplot(data = rxntime_clean,
+       # x-axis: date
+       # y-axis: rxntime
+       # color, line type, and size by region
+       mapping = aes(x = date_mm_dd_yyyy,
+                     y = reaction_time_avg_ms,
+                     color = exercise_type,
+                     linetype = exercise_type,
+                     linewidth = exercise_type)) +
+  # adding lines
+  geom_line() + 
+  # relabeling axes
+  # adding title and subtitle
+  labs( x = "Date",
+        y = "Mean Reaction Time (ms)",
+        color = "exercise_type",
+        title = "Mean Reaction Times by Exercise Type") +
   # custom colors
-  scale_color_manual(values = c("Northern" = "hotpink",
-                                "Southern" = "orange")) +
-  # removed grid lines
-  theme(panel.grid = element_blank(),
-        axis.line = element_line(color = "black"))
-```
-
-### Box plot for Mann-Whitney U test
-
-```{r}
-# base layer: ggplot
-ggplot(data = halibut,
-       # x-axis: region
-       # y-axis: landing weight
-       mapping = aes(x = ca_region,
-                     y = landings_lb,
-                     fill = ca_region)) +
-  # first layer creating boxplots for each region
-  geom_boxplot() +
-  # relabeled axes titles
-  labs(x = "Region of California",
-       y = "Landings (lb)") +
-  # raw individual data points (jitter with horizontal break)
-  # x-axis: region
-  # y-axis: landing weight
-   geom_jitter(data = halibut,
-            mapping = aes(x = ca_region,
-                          y = landings_lb,
-                          color = ca_region),
-            width = 0.3,
-            height = 0,
-            size = 1.5,
-            alpha = 0.5,
-            shape = 21) +
-  # custom theme
-  theme_minimal() +
-  # removed legend
-  theme(legend.position = "none") +
-  # custom colors: raw data points
   scale_color_manual(values =
-                       c("Northern" = "hotpink",
-                         "Southern" = "orange")) +
-  # custom colors: boxplot fill
-  scale_fill_manual(values = c("Northern" = "hotpink",
-                                "Southern" = "orange")) +
-  # removed grid lines
-  theme(panel.grid = element_blank(),
-        axis.line = element_line(color = "black"))
+                       c("Biking" = "red",
+                         "Volleyball" = "green4")) +
+  # custom line type
+  scale_linetype_manual(values =
+                          c("Biking" = "dotted",
+                            "Volleyball" = "solid")) +
+  # custom line sizes
+  scale_linewidth_manual(values = 
+                      c("Biking" = 1,
+                        "Volleyball" = 0.7)) +
+  # adjusting figure presentation
+  theme(
+    axis.text.x = element_text(angle = 45), # angling x-axis text
+    axis.title.y = element_text(angle = 0, # repositioning y-axis title
+                                vjust = 0.6, # y-axis title placement
+                                size = 8, # y-axis title size
+                                margin = margin(t = 20,
+                                                r = 0,
+                                                b = 0,
+                                                l = 0)),
+    # x-axis title size
+    axis.title.x = element_text(size = 8),
+    # plot title adjustments
+    plot.title.position = "plot",
+    plot.title = element_text(hjust = 0, # shifting plot title to the left
+                              size = 10), # changing plot title size
+    plot.subtitle = element_text(size = 8), # changing plot subtitle size
+    legend.position = c(1, 1), # legend to the top right
+    legend.justification = c(1, 1), # justifying legend
+    panel.background = element_blank(), # removing panel background
+    axis.line.y = element_blank(), # no y-axis line
+    panel.grid = element_blank(), # removing panel grid
+    axis.ticks = element_blank(), # removing axis ticks
+    legend.title = element_blank() # removing the legend title
+  )
 ```
 
-## b. Arrange visuazliations using the design platform of your choosing.
+# Part 4. Write about your process
 
-ok
-
-# Part 4. Write-up
-
-**General information about design and visualization**
-
-What patterns are you highlighting in each visualization? Why?
-
-Outside of the data visualization, what aesthetic choices (e.g. color, font, arrangement) did you make and why?
-
-In what way do your choices contribute to a compelling or interesting narrative?
-
-**Sources and process**
-
-For each visualization, describe what examples inspired that visualization (cite the author)
-
-Describe your coding process, for example (not the only options for this prompt): did you have to clean up/summarize the data before you started? Which geoms did you start with? What geoms did you end up using, and why?
-
-Describe the tools you used: other people’s code? Google/StackOverflow? ChatGPT (with examples of prompts)?
+A classmate on Friday used birds to represent raw data points.
