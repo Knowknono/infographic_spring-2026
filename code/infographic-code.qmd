@@ -16,6 +16,7 @@ library(tidyverse)
 library(janitor)
 library(here)
 library(webr)
+library(ggimage)
 
 # read in data and saved as object called `rxntime`
 rxntime <- read_csv("data/rxn-time.csv")
@@ -26,6 +27,14 @@ pie <- read_csv("data/pie.csv")
 Data last updated on May 29, 2026.
 
 # Part 3. Visualizing data
+
+```{r}
+my_cols <- c(
+  biking = "slateblue",
+  volleyball = "dodgerblue",
+  walking = "lightskyblue"
+)
+```
 
 ## Pie chart
 
@@ -51,7 +60,6 @@ pie_clean <- pie |>
 
 ```{r}
 piee <- as.data.frame(pie_clean); piee
-  group_by(exercise_type, social_interaction)
 
 # created a pie donut chart using the webr package and pie_clean df
 PieDonut(data = pie_clean,
@@ -61,15 +69,60 @@ PieDonut(data = pie_clean,
          r0 = 0.5, # inner ring thickness
          r1 = 1, # outer ring thickness
          ratioByGroup = FALSE,
-         title = "Social Interaction Percentage by Exercise Type",
-         )
+         title = "Social Interaction Percentage by Exercise Type")
 ```
 
-## Strip plot
+## Box / jitter plot
+
+### Cleaning data
 
 ```{r}
-
+# created a new object from rxntime
+rxntime_clean <- rxntime |>
+  # cleaned column names
+  clean_names() |> 
+  # selected columns of interest
+  select(exercise_type, reaction_time_avg_ms) |> 
+  # changed existing abbreviations
+  mutate(exercise_type = case_when(
+    exercise_type == "volleyball" ~ "Volleyball",
+    exercise_type == "biking" ~ "Biking",
+    exercise_type == "walking" ~ "Walking"
+  )) |> 
+  # removed missing values
+  drop_na()
 ```
+
+### Visualization
+
+```{r}
+# base layer: ggplot
+ggplot(data = rxntime_clean,
+       # x-axis: exercise type
+       # y-axis: mean reaction time
+       # color by exercise type
+       mapping = aes(x = exercise_type,
+                     y = reaction_time_avg_ms,
+                     color = exercise_type)) +
+  # first layer: boxplot
+  geom_boxplot() +
+  # second layer: jitter for raw data
+  geom_jitter(height = 0) +
+  # relabeled x- and y-axes
+  labs(x = "Exercise Type",
+       y = "Mean Reaction Time (ms)") +
+  # removed legend
+  theme(legend.position = "none") +
+  # custom colors
+  scale_color_manual(values = c("Biking" = "slateblue",
+                                "Volleyball" = "dodgerblue",
+                                "Walking" = "lightskyblue")) +
+  # removed grid lines
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"))
+```
+
+^^ add drawing to negative space in the plot
 
 ## Timeseries plot
 
