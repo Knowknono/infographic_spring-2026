@@ -126,63 +126,29 @@ ggplot(data = rxntime_clean,
 
 ## Timeseries plot
 
+### Cleaning data
+
 ```{r}
-# base layer: ggplot
-ggplot(data = rxntime_clean,
-       # x-axis: date
-       # y-axis: rxntime
-       # color, line type, and size by region
-       mapping = aes(x = date_mm_dd_yyyy,
-                     y = reaction_time_avg_ms,
-                     color = exercise_type,
-                     linetype = exercise_type,
-                     linewidth = exercise_type)) +
-  # adding lines
-  geom_line() + 
-  # relabeling axes
-  # adding title and subtitle
-  labs( x = "Date",
-        y = "Mean Reaction Time (ms)",
-        color = "exercise_type",
-        title = "Mean Reaction Times by Exercise Type") +
-  # custom colors
-  scale_color_manual(values =
-                       c("Biking" = "red",
-                         "Volleyball" = "green4")) +
-  # custom line type
-  scale_linetype_manual(values =
-                          c("Biking" = "dotted",
-                            "Volleyball" = "solid")) +
-  # custom line sizes
-  scale_linewidth_manual(values = 
-                      c("Biking" = 1,
-                        "Volleyball" = 0.7)) +
-  # adjusting figure presentation
-  theme(
-    axis.text.x = element_text(angle = 45), # angling x-axis text
-    axis.title.y = element_text(angle = 0, # repositioning y-axis title
-                                vjust = 0.6, # y-axis title placement
-                                size = 8, # y-axis title size
-                                margin = margin(t = 20,
-                                                r = 0,
-                                                b = 0,
-                                                l = 0)),
-    # x-axis title size
-    axis.title.x = element_text(size = 8),
-    # plot title adjustments
-    plot.title.position = "plot",
-    plot.title = element_text(hjust = 0, # shifting plot title to the left
-                              size = 10), # changing plot title size
-    plot.subtitle = element_text(size = 8), # changing plot subtitle size
-    legend.position = c(1, 1), # legend to the top right
-    legend.justification = c(1, 1), # justifying legend
-    panel.background = element_blank(), # removing panel background
-    axis.line.y = element_blank(), # no y-axis line
-    panel.grid = element_blank(), # removing panel grid
-    axis.ticks = element_blank(), # removing axis ticks
-    legend.title = element_blank() # removing the legend title
-  )
+# created a new object from rxntime
+rxntimex2 <- rxntime |> 
+  # cleaned column names
+  clean_names() |> 
+  # selected columns of interest
+  select(exercise_type, date_mm_dd_yyyy, reaction_time_avg_ms) |> 
+  # removed missing values
+  drop_na()
 ```
+
+### Visualization
+
+```{r}
+ggplot(data = rxntimex2,
+       mapping = aes(x = date_mm_dd_yyyy,
+                     y = reaction_time_avg_ms)) +
+  geom_line() 
+```
+
+trying things
 
 # Part 4. Write about your process
 
