@@ -19,32 +19,52 @@ library(webr)
 
 # read in data and saved as object called `rxntime`
 rxntime <- read_csv("data/rxn-time.csv")
+# read in data and saved as object called `pie`
+pie <- read_csv("data/pie.csv")
 ```
 
-Data last updated on May 27, 2026.
+Data last updated on May 29, 2026.
 
 # Part 3. Visualizing data
 
-## a. Cleaning data
+## Pie chart
 
+### Cleaning data
+
+ignore below for now
 ```{r}
-rxntime_clean <- rxntime |> 
-  clean_names()
+# created a new object from rxntime
+rxntime_clean <- rxntime |>
+  # cleaned column names
+  clean_names() |> 
+  # selected columns of interest
+  select(exercise_type, reaction_time_avg_ms, social_interaction) |> 
+  # changed existing abbreviations
+  mutate(social_interaction = case_when(
+    social_interaction == "y" ~ "Yes",
+    social_interaction == "n" ~ "No"
+  )) |> 
+  # removed missing values
+  drop_na()
 ```
 
-### Pie chart
+### Visualization
+
+```{r}
+rxntime_pie <- as.data.frame(rxntime_clean); rxntime_pie
+  group_by(exercise_type, social_interaction)
+
+PieDonut(data = rxntime_pie,
+         aes(exercise_type, social_interaction, count = n))
+```
+
+## Strip plot
 
 ```{r}
 
 ```
 
-### Strip plot
-
-```{r}
-
-```
-
-### Timeseries plot
+## Timeseries plot
 
 ```{r}
 # base layer: ggplot
