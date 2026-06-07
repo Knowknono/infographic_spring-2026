@@ -31,11 +31,8 @@ pie <- readr::read_csv(here::here("data","pie-data.csv"))
 # imported fonts
 # 1st argument: google name, 
 # 2nd name: font name in R
-font_add_google('Lora', 'lora')
-font_add_google('Lobster', 'lobster')
-font_add_google('Anton', 'anton')
-font_add_google('Fira Sans', 'firasans')
-font_add_google('Syne Mono', 'syne')
+font_add_google('Exo 2', 'exo2', 700)
+font_add_google('Exo 2', 'exo')
 
 # enabled showtext font rendering
 showtext_auto()
@@ -66,7 +63,7 @@ pie_clean <- pie |>
 ### Visualization
 
 ```{r}
-# created a pie donut chart using the webr package and pie_clean df
+# save plot as an object <- created a pie donut chart with pie_clean df
 piechart <- PieDonut(data = pie_clean,
          # pie slices by exercise type, outlined by social interaction
          aes(exercise_type, social_interaction, count = count),
@@ -119,24 +116,38 @@ rxntime_scatter <- rxntime_clean |>
 ```
 
 ```{r}
-# base layer: ggplot
+# called showtext
+showtext_auto()
+
+# saved plot as an object <- base layer: ggplot
 scatterplot <- ggplot(rxntime_scatter,
-       # x-axis: exercise duration in minutes
-       # y-axis: average reaction time in milliseconds
-       aes(x = exercise_duration_min,
-           y = reaction_time_avg_ms)) +
+            # x-axis: exercise duration in minutes
+            # y-axis: avg reaction time in milliseconds
+            aes(x = exercise_duration_min,
+                y = reaction_time_avg_ms)) +
   # first layer: data points represented by custom icons
-  geom_image(
-    aes(image = image), # icon placement
+  geom_image(aes(
+    image = image), # icon placement
     size = 0.05, # icon size
     asp = 1) + # square aspect ratio
   # custom theme
   theme_minimal() +
-  # removed legend
-  theme(legend.position = "none",
-        panel.background = element_blank(), # removing panel background
-        panel.grid = element_blank(), # removing panel grid
-        axis.ticks = element_blank()) + # removing axis ticks
+  theme(
+    legend.position = "none", # removed legend
+    panel.background = element_rect(fill = NA, # removed fill and color
+                                     color = NA),
+    panel.grid = element_blank(), # removed panel grid
+    axis.ticks = element_blank(), # removed axis ticks
+    plot.background = element_rect(fill = NA, # removed fill and color
+                                   color = NA),
+    plot.title = element_text(family = "exo2", # title custom font
+                              size = 20),
+    axis.title = element_text(family = "exo", # axis title font
+                              size = 14),
+    axis.title.x = element_text(margin = margin(t = 8)), # text spacing
+    axis.title.y = element_text(angle = 0, # repositioned y-axis text
+                                margin = margin(r = 8)),
+    axis.text = element_text(family = "exo", size = 12)) + # tick label font
   # relabeled x- and y- axes, adding title
   labs(title = "Exercise Duration and Reaction Time",
        x = "Exercise Duration (min)",
@@ -146,63 +157,14 @@ scatterplot <- ggplot(rxntime_scatter,
 print(scatterplot)
 
 # PNG export
-ggsave("boxplot.png",
-       plot = get_last_plot(),
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 6,
-       height = 6,
-       units = "in",
-       dpi = 300)
-```
-
-
-```{r}
-**THIS IS A TEST CHUNK**
-  
-  scatterplot <- ggplot(rxntime_scatter,
-       # x-axis: exercise duration in minutes
-       # y-axis: average reaction time in milliseconds
-       aes(x = exercise_duration_min,
-           y = reaction_time_avg_ms)) +
-  # first layer: data points represented by custom icons
-  geom_image(
-    aes(image = image), # icon placement
-    size = 0.05, # icon size
-    asp = 1) + # square aspect ratio
-  # custom theme
-  theme_minimal() +
-  # removed legend
-  theme(legend.position = "none",
-        panel.background = element_blank(), # removing panel background
-        panel.grid = element_blank(), # removing panel grid
-        axis.ticks = element_blank(), # removing axis ticks
-        axis.title = element_blank(),
-        axis.text = element_blank()) +
-  annotate("text",
-           1,
-           1.1,
-           family = "lobster",
-           size = 15) +
-               label = "\u4F60\u597D\uFF0C\u4E16\u754C") +
-
-  # relabeled x- and y- axes, adding title
-  labs(title = "Exercise Duration and Reaction Time",
-       x = "Exercise Duration (min)",
-       y = "Average Reaction Time (ms)")
-
-# view figure in plots
-print(scatterplot)
-
-# PNG export
-ggsave("boxplot.png",
-       plot = get_last_plot(),
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 6,
-       height = 6,
-       units = "in",
-       dpi = 300)
+ggsave("scatterplot.png",
+       plot = get_last_plot(), # selected plot to save
+       device = ragg::agg_png, # supports alpha
+       bg = "transparent", # transparent background
+       width = 4, # adjusted width
+       height = 3, # adjusted height
+       units = "in", # units of plot measurements
+       dpi = 300) # resolution
 ```
 
 ## Box / jitter plot
@@ -213,18 +175,19 @@ ggsave("boxplot.png",
 # created a new object from rxntime
 rxntime_box <- rxntime |>
   # cleaned column names
-  clean_names() |> 
+  clean_names() |>
   # selected columns of interest
-  select(exercise_type, reaction_time_avg_ms) |> 
-  # changed existing abbreviations
-  mutate(case_when(
+  select(exercise_type, reaction_time_avg_ms) |>
+  # created a new column for images in df
+  mutate(image = img_map[exercise_type]) |>
+  # capitalized existing abbreviations
+  mutate(exercise_type = case_when(
     exercise_type == "volleyball" ~ "Volleyball",
-    exercise_type == "biking" ~ "Biking",
-    exercise_type == "walking" ~ "Walking",
+    exercise_type == "biking"    ~ "Biking",
+    exercise_type == "walking"   ~ "Walking",
     # assigned exercise types to images
-    TRUE ~ as.character(exercise_type))) |>
-    # created a new column for images
-    mutate(image = img_map[exercise_type]) |> 
+    TRUE ~ as.character(exercise_type)
+  )) |>
   # removed missing values
   drop_na()
 ```
@@ -232,15 +195,10 @@ rxntime_box <- rxntime |>
 ### Visualization
 
 ```{r}
-# new object from rxntime_clean
-rxntime_box <- rxntime_clean |> 
-  # mutated data frame for the addition of icons
-  mutate(exercise_type = as.character(exercise_type),
-         image = img_map[exercise_type])
-```
+# called showtext
+showtext_auto()
 
-```{r}
-# base layer: ggplot
+# save plot as an object <- base layer: ggplot
 boxplot <- ggplot(data = rxntime_box,
        # x-axis: exercise type
        # y-axis: mean reaction time
@@ -255,20 +213,34 @@ boxplot <- ggplot(data = rxntime_box,
     aes(image = image),
     position = position_jitter(width = 0.15, 
                                height = 0),
-    size = 0.045,
-    asp = 1) +
-  # relabeled x- and y-axes
-  labs(x = "Exercise Type",
+    size = 0.045, # icon size
+    asp = 1) + # icon aspect ratio
+  # added title and relabeled x- and y-axes
+  labs(title = "Exercise Type and Reaction Time",
+       x = "Exercise Type",
        y = "Mean Reaction Time (ms)") +
+  # custom theme
+  theme_minimal() +
   # removed legend
-  theme(legend.position = "none",
-        panel.background = element_blank(), # removing panel background
-        panel.grid = element_blank(), # removing panel grid
-        axis.ticks = element_blank()) + # removing axis ticks
+  theme(legend.position = "none", # removed legend
+        panel.background = element_rect(fill = NA, # removed fill and color
+                                     color = NA),
+        panel.grid = element_blank(), # removed panel grid
+        axis.ticks = element_blank(), # removed axis ticks
+        plot.background = element_rect(fill = NA, # removed fill and color
+                                   color = NA),
+        plot.title = element_text(family = "exo2", # title custom font
+                              size = 20),
+        axis.title = element_text(family = "exo", # axis title font
+                              size = 14),
+        axis.title.x = element_text(margin = margin(t = 8)), # text spacing
+        axis.title.y = element_text(angle = 0, # repositioned y-axis text
+                                margin = margin(r = 8)),
+        axis.text = element_text(family = "exo", size = 12)) + # tick label font
   # custom colors
-  scale_color_manual(values = c("biking" = "slateblue",
-                                "volleyball" = "dodgerblue",
-                                "walking" = "lightskyblue")) +
+  scale_color_manual(values = c("Biking" = "slateblue",
+                                "Volleyball" = "dodgerblue",
+                                "Walking" = "lightskyblue")) +
   # removed grid lines
   theme(panel.grid = element_blank(),
         axis.line = element_line(color = "black"))
@@ -277,42 +249,14 @@ boxplot <- ggplot(data = rxntime_box,
 print(boxplot)
 
 # PNG export
-ggsave("scatter.png",
-       plot = get_last_plot(),
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 6,
-       height = 6,
-       units = "in",
-       dpi = 300)
-```
-
-## Image export
-
-```{r}
-# transparent PNG export
-ggsave("pie.png",
-       plot = piechart,
-       bg = "transparent",
-       width = 4,
-       height = 3,
-       dpi = 300)
-
-ggsave("boxjitter.png",
-       plot = boxplot,
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 4,
-       height = 3,
-       dpi = 300)
-
-ggsave("scatter.png",
-       plot = scatterplot,
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 4,
-       height = 3,
-       dpi = 300)
+ggsave("box.png",
+       plot = get_last_plot(), # selected plot to save
+       device = ragg::agg_png, # supports alpha
+       bg = "transparent", # transparent background
+       width = 4, # adjusted width
+       height = 3, # adjusted height
+       units = "in", # units of plot measurements
+       dpi = 300) # resolution
 ```
 
 # Part 4. Write about your process
