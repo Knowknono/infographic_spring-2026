@@ -19,22 +19,15 @@ library(webr)
 library(ggimage)
 
 # read in data and saved as object called `rxntime`
-rxntime <- read_csv("data/rxn-time.csv")
-# read in data and saved as object called `pie`
-pie <- read_csv("data/pie.csv")
+rxntime   <- readr::read_csv(here::here("data","new-data.csv"))
+
+# read in my data and saved as object called 'pie'
+pie <- readr::read_csv(here::here("data","pie-data.csv"))
 ```
 
 Data last updated on May 29, 2026.
 
 # Part 3. Visualizing data
-
-```{r}
-my_cols <- c(
-  biking = "slateblue",
-  volleyball = "dodgerblue",
-  walking = "lightskyblue"
-)
-```
 
 ## Pie chart
 
@@ -78,7 +71,7 @@ PieDonut(data = pie_clean,
 
 ```{r}
 # created a new object from rxntime
-rxntime_clean <- rxntime |>
+rxntime_box <- rxntime |>
   # cleaned column names
   clean_names() |> 
   # selected columns of interest
@@ -97,7 +90,7 @@ rxntime_clean <- rxntime |>
 
 ```{r}
 # base layer: ggplot
-ggplot(data = rxntime_clean,
+ggplot(data = rxntime_box,
        # x-axis: exercise type
        # y-axis: mean reaction time
        # color by exercise type
@@ -130,11 +123,11 @@ ggplot(data = rxntime_clean,
 
 ```{r}
 # created a new object from rxntime
-rxntimex2 <- rxntime |> 
+rxntime_clean <- rxntime |> 
   # cleaned column names
   clean_names() |> 
   # selected columns of interest
-  select(exercise_type, date_mm_dd_yyyy, reaction_time_avg_ms) |> 
+  select(exercise_duration_min, reaction_time_avg_ms) |> 
   # removed missing values
   drop_na()
 ```
@@ -142,13 +135,35 @@ rxntimex2 <- rxntime |>
 ### Visualization
 
 ```{r}
-ggplot(data = rxntimex2,
-       mapping = aes(x = date_mm_dd_yyyy,
-                     y = reaction_time_avg_ms)) +
-  geom_line() 
+# base layer: ggplot
+ggplot(data = rxntime_clean,
+       # x-axis: exercise duration in minutes
+       # y-axis: average reaction time in milliseconds
+       # color
+       mapping = aes(x = "Exercise Type",
+                     y = "Average Reaction Time (ms)")) +
+  # first layer: data points
+  geom_point(data = rxntime_clean,
+             aes(x = exercise_duration_min,
+                 y = reaction_time_avg_ms,
+                 size = 2,
+                 color = "pink")) +
+  # changed theme
+  theme_minimal() +
+  # removed legend
+  theme(legend.position = "none",
+        panel.background = element_blank(), # removing panel background
+        panel.grid = element_blank(), # removing panel grid
+        axis.ticks = element_blank(), # removing axis ticks
+    ) +
+  # relabeled x- and y- axes, adding title
+  labs(title = "Exercise Duration and Reaction Time",
+       subtitle = "May 29, 2026",
+       x = "Exercise Duration (min)",
+       y = "Average Reaction Time (ms)") +
+  # custom colors
+  scale_color_manual(values = "dodgerblue")
 ```
-
-trying things
 
 # Part 4. Write about your process
 
