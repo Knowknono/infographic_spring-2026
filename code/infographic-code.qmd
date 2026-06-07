@@ -61,74 +61,10 @@ pie_clean <- pie |>
 piechart <- PieDonut(data = pie_clean,
          # pie slices by exercise type, outlined by social interaction
          aes(exercise_type, social_interaction, count = count),
-         # outer circle of the pie adds up to 100%
          r0 = 0.5, # inner ring thickness
          r1 = 1, # outer ring thickness
-         ratioByGroup = FALSE,
-         title = "Social Interaction Percentage by Exercise Type")
-```
-
-## Box / jitter plot
-
-### Cleaning data
-
-```{r}
-# created a new object from rxntime
-rxntime_box <- rxntime |>
-  # cleaned column names
-  clean_names() |> 
-  # selected columns of interest
-  select(exercise_type, reaction_time_avg_ms) |> 
-  # changed existing abbreviations
-  mutate(case_when(
-    exercise_type == "volleyball" ~ "Volleyball",
-    exercise_type == "biking" ~ "Biking",
-    exercise_type == "walking" ~ "Walking",
-    TRUE ~ as.character(exercise_type))) |> 
-    mutate(image = img_map[exercise_type]) |> 
- 
-  # removed missing values
-  drop_na()
-```
-
-### Visualization
-
-```{r}
-rxntime_ <- rxntime_clean |> 
-  mutate(exercise_type = as.character(exercise_type),
-         image = img_map[exercise_type])
-```
-
-```{r}
-# base layer: ggplot
-boxplot <- ggplot(data = rxntime_box,
-       # x-axis: exercise type
-       # y-axis: mean reaction time
-       # color by exercise type
-       mapping = aes(x = exercise_type,
-                     y = reaction_time_avg_ms,
-                     color = exercise_type)) +
-  # first layer: boxplot
-  geom_boxplot() +
-  # second layer: icons and jitter
-  geom_image(
-    aes(image = image),
-    position = position_jitter(width = 0.15,
-                               height = 0),
-    size = 0.045,
-    asp = 1) +
-  # relabeled x- and y-axes
-  labs(x = "Exercise Type",
-       y = "Mean Reaction Time (ms)") +
-  # removed legend
-  theme(legend.position = "none") +
-  # custom colors
-  scale_color_manual(values = c("biking" = "slateblue",
-                                "volleyball" = "dodgerblue",
-                                "walking" = "lightskyblue")) +
-  # removed grid lines
-  theme(panel.grid = element_blank(),
-        axis.line = element_line(color = "black"))
+         ratioByGroup = FALSE, # outer circle of the pie adds up to 100%
+         title = "Social Interaction Percentage by Exercise Type") # added title
 ```
 
 ## Scatter plot
@@ -149,20 +85,33 @@ rxntime_clean <- rxntime |>
 ### Visualization
 
 ```{r}
+# created image map by exercise type
+img_map <- c(
+  biking = "images/biking.png",
+  volleyball = "images/vb.png",
+  walking = "images/walking.png"
+)
+
+# new object from clean data frame
+rxntime_scatter <- rxntime_clean |>
+  # mutated data frame for the addition of icons
+  mutate(exercise_type = as.character(exercise_type),
+         image = img_map[exercise_type])
+```
+
+```{r}
 # base layer: ggplot
-scatterplot <- ggplot(data = rxntime_clean,
+scatterplot <- ggplot(rxntime_scatter,
        # x-axis: exercise duration in minutes
        # y-axis: average reaction time in milliseconds
-       # color
-       mapping = aes(x = "Exercise Type",
-                     y = "Average Reaction Time (ms)")) +
-  # first layer: data points
-  geom_point(data = rxntime_clean,
-             aes(x = exercise_duration_min,
-                 y = reaction_time_avg_ms,
-                 size = 2,
-                 color = "pink")) +
-  # changed theme
+       aes(x = exercise_duration_min,
+           y = reaction_time_avg_ms)) +
+  # first layer: data points represented by custom icons
+  geom_image(
+    aes(image = image), # icon placement
+    size = 0.05, # icon size
+    asp = 1) + # square aspect ratio
+  # custom theme
   theme_minimal() +
   # removed legend
   theme(legend.position = "none",
@@ -172,40 +121,74 @@ scatterplot <- ggplot(data = rxntime_clean,
     ) +
   # relabeled x- and y- axes, adding title
   labs(title = "Exercise Duration and Reaction Time",
-       subtitle = "May 29, 2026",
        x = "Exercise Duration (min)",
-       y = "Average Reaction Time (ms)") +
-  # custom colors
-  scale_color_manual(values = "dodgerblue")
+       y = "Average Reaction Time (ms)")
 ```
 
-```{r}
-img_map <- c(
-  biking = "images/biking.png",
-  volleyball = "images/vb.png",
-  walking = "images/walking.png"
-)
+## Box / jitter plot
 
-rxntime_clean <- rxntime_clean |> 
+### Cleaning data
+
+```{r}
+# created a new object from rxntime
+rxntime_box <- rxntime |>
+  # cleaned column names
   clean_names() |> 
+  # selected columns of interest
+  select(exercise_type, reaction_time_avg_ms) |> 
+  # changed existing abbreviations
+  mutate(case_when(
+    exercise_type == "volleyball" ~ "Volleyball",
+    exercise_type == "biking" ~ "Biking",
+    exercise_type == "walking" ~ "Walking",
+    # assigned exercise types to images
+    TRUE ~ as.character(exercise_type))) |>
+    # created a new column for images
+    mutate(image = img_map[exercise_type]) |> 
+  # removed missing values
+  drop_na()
+```
+
+### Visualization
+
+```{r}
+# new object from rxntime_clean
+rxntime_box <- rxntime_clean |> 
+  # mutated data frame for the addition of icons
   mutate(exercise_type = as.character(exercise_type),
          image = img_map[exercise_type])
 ```
 
 ```{r}
 # base layer: ggplot
-ggplot(rxntime_clean,
-       # x-axis: exercise duration in minutes
-       # y-axis: average reaction time in milliseconds
-       aes(x = exercise_duration_min,
-           y = reaction_time_avg_ms)) +
-  # first layer: data points represented by custom icons
+boxplot <- ggplot(data = rxntime_box,
+       # x-axis: exercise type
+       # y-axis: mean reaction time
+       # color by exercise type
+       mapping = aes(x = exercise_type,
+                     y = reaction_time_avg_ms,
+                     color = exercise_type)) +
+  # first layer: boxplot
+  geom_boxplot() +
+  # second layer: icons and jitter
   geom_image(
-    aes(image = image), # icon placement
-    size = 0.045, # icon size
-    asp = 1) + # square aspect ratio
-  # custom theme
-  theme_minimal()
+    aes(image = image),
+    position = position_jitter(width = 0.15, 
+                               height = 0),
+    size = 0.045,
+    asp = 1) +
+  # relabeled x- and y-axes
+  labs(x = "Exercise Type",
+       y = "Mean Reaction Time (ms)") +
+  # removed legend
+  theme(legend.position = "none") +
+  # custom colors
+  scale_color_manual(values = c("biking" = "slateblue",
+                                "volleyball" = "dodgerblue",
+                                "walking" = "lightskyblue")) +
+  # removed grid lines
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"))
 ```
 
 ## Image export
