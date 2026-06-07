@@ -63,6 +63,10 @@ pie_clean <- pie |>
 ### Visualization
 
 ```{r}
+#| message: false
+#| warning: false
+#| fig-height: 6
+#| fig-width: 8
 # save plot as an object <- created a pie donut chart with pie_clean df
 piechart <- PieDonut(data = pie_clean,
          # pie slices by exercise type, outlined by social interaction
@@ -70,10 +74,10 @@ piechart <- PieDonut(data = pie_clean,
          r0 = 0.3, # inner ring thickness
          r1 = 1, # outer ring thickness
          ratioByGroup = FALSE, # outer circle of the pie adds up to 100%
-         title = "Social Interaction Percentage by Exercise Type") # added title
+         title = "Social Interaction Percentage by Exercise Type") # title
 
 # PNG export
-ggsave("exports/pie.png",
+ggsave("C:/github/ENVS-193DS_spring-2026_infographic/exports/pie.png",
        plot = get_last_plot(),
        device = ragg::agg_png,
        bg = "transparent",
@@ -103,9 +107,9 @@ rxntime_clean <- rxntime |>
 ```{r}
 # created image map by exercise type
 img_map <- c(
-  biking = "images/biking.png",
-  volleyball = "images/vb.png",
-  walking = "images/walking.png"
+  biking = "C:/github/ENVS-193DS_spring-2026_infographic/images/biking.png",
+  volleyball = "C:/github/ENVS-193DS_spring-2026_infographic/images/vb.png",
+  walking = "C:/github/ENVS-193DS_spring-2026_infographic/images/walking.png"
 )
 
 # new object from clean data frame
@@ -145,9 +149,7 @@ scatterplot <- ggplot(rxntime_scatter,
     axis.title = element_text(family = "exo", # axis title font
                               size = 14),
     axis.title.x = element_text(margin = margin(t = 8)), # text spacing
-    axis.title.y = element_text(angle = 0, # repositioned y-axis text
-                                margin = margin(r = 8)),
-    axis.text = element_text(family = "exo", size = 12)) + # tick label font
+    axis.text = element_text(family = "exo", size = 12)) + # tick label
   # relabeled x- and y- axes, adding title
   labs(title = "Exercise Duration and Reaction Time",
        x = "Exercise Duration (min)",
@@ -157,7 +159,7 @@ scatterplot <- ggplot(rxntime_scatter,
 print(scatterplot)
 
 # PNG export
-ggsave("exports/scatterplot.png",
+ggsave("C:/github/ENVS-193DS_spring-2026_infographic/exports/scatterplot.png",
        plot = get_last_plot(), # selected plot to save
        device = ragg::agg_png, # supports alpha
        bg = "transparent", # transparent background
@@ -234,8 +236,6 @@ boxplot <- ggplot(data = rxntime_box,
         axis.title = element_text(family = "exo", # axis title font
                               size = 14),
         axis.title.x = element_text(margin = margin(t = 8)), # text spacing
-        axis.title.y = element_text(angle = 0, # repositioned y-axis text
-                                margin = margin(r = 8)),
         axis.text = element_text(family = "exo", size = 12)) + # tick label font
   # custom colors
   scale_color_manual(values = c("Biking" = "slateblue",
@@ -249,7 +249,7 @@ boxplot <- ggplot(data = rxntime_box,
 print(boxplot)
 
 # PNG export
-ggsave("exports/box.png",
+ggsave("C:/github/ENVS-193DS_spring-2026_infographic/exports/box.png",
        plot = get_last_plot(), # selected plot to save
        device = ragg::agg_png, # supports alpha
        bg = "transparent", # transparent background
@@ -261,10 +261,18 @@ ggsave("exports/box.png",
 
 # Part 4. Write about your process
 
-A classmate on Friday used birds to represent raw data points.
+## General design and visualization information
 
-## e.
+The donut pie chart was constructed around the frequency of each exercise type, but I also attempted to include information about socialization in the outer ring of the chart. I positioned it towards the top because it seemed like the easiest to understand visually and would make a good introduction to the exercise types referenced in the other figures. The scatter plot highlights the relationship between exercise duration and reaction time, and the box plot indicates the relationship between exercise type and reaction time. I wanted to show that there was a great variety in reaction times across exercise sessions of different time lengths for the former, and that mean reaction times ended up being different across all the exercise types for the latter.
 
-```{r fig-screenshot, echo=FALSE, out.width='400px'}
-knitr::include_graphics("images/final.png")
-```
+At first, I thought of leaning into a "digital" theme because data input happened via my phone, the Google Sheets app, and an online reaction time test. But my initial choices in fonts were rigid and blocky. Paired with darker color palettes, they looked uninteresting and gloomy.
+
+I went with blue because I associate it with vitality. Energy is needed for exercise and exercising revitalizes. I also associate the color with the sky here on nice days. Those are the best days to bike, walk, and play volleyball. A more relaxed font was used in conjunction with Exo and Exo 2 for a mix of words that felt balanced and easy on the eyes.
+
+## Sources and process
+
+The donut pie chart was inspired by [The Data Digest](https://www.youtube.com/@TheDataDigest), a YouTuber who uses statistical analysis to discuss Magnus Carlsen's chess matches, TV show endings, and other topics. He created a [tutorial](https://www.youtube.com/watch?v=AHRh4yyHl4g) that I referenced to create my own pie donut.
+
+The box and scatter plots were visualizations we've become familiar with in class, but the icons were inspired by an affective visualization I saw in our last section on Friday. A classmate had used birds to represent raw data points, and the buildings on which the birds sat also represented data points. I wanted to try something similar, at least in terms of adding icons to my figures. For both figures, I cleaned the data and used geom_image to place imported icons onto the plots. The box plot used geom_boxplot.
+
+I troubleshooted errors in my code through forums on StackOverflow (I was relieved to see that others had run into the same issues I did and sought help from experts), watched tutorials on YouTube, and read articles (mostly for showtext and the pie donut) in many attempts to make the code work.
