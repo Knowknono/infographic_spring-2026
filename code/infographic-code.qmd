@@ -1,6 +1,6 @@
 ---
 title: "ENVS 193DS Infographic"
-date: "June 6, 2026" 
+date: "June 7, 2026" 
 author: "Danielle Sur" 
 format: pdf 
 editor: source
@@ -32,8 +32,6 @@ pie <- readr::read_csv(here::here("data","pie-data.csv"))
 time <- readr::read_csv(here::here("data","time-data.csv"))
 ```
 
-Data last updated on May 29, 2026.
-
 # Part 3. Visualizing data
 
 ## Pie chart
@@ -59,8 +57,6 @@ pie_clean <- pie |>
 ### Visualization
 
 ```{r}
-piee <- as.data.frame(pie_clean); piee
-
 # created a pie donut chart using the webr package and pie_clean df
 piechart <- PieDonut(data = pie_clean,
          # pie slices by exercise type, outlined by social interaction
@@ -135,8 +131,6 @@ boxplot <- ggplot(data = rxntime_box,
         axis.line = element_line(color = "black"))
 ```
 
-^^ add drawing to negative space in the plot
-
 ## Scatter plot
 
 ### Cleaning data
@@ -193,28 +187,52 @@ img_map <- c(
 )
 
 rxntime_clean <- rxntime_clean |> 
+  clean_names() |> 
   mutate(exercise_type = as.character(exercise_type),
          image = img_map[exercise_type])
 ```
 
 ```{r}
+# base layer: ggplot
 ggplot(rxntime_clean,
+       # x-axis: exercise duration in minutes
+       # y-axis: average reaction time in milliseconds
        aes(x = exercise_duration_min,
            y = reaction_time_avg_ms)) +
+  # first layer: data points represented by custom icons
   geom_image(
-    aes(image = image),
-    size = 0.045,
-    asp = 1) +
+    aes(image = image), # icon placement
+    size = 0.045, # icon size
+    asp = 1) + # square aspect ratio
+  # custom theme
   theme_minimal()
 ```
+
+## Image export
 
 ```{r}
 # transparent PNG export
 ggsave("pie.png",
        plot = piechart,
        bg = "transparent",
-       width = 8,
-       height = 6,
+       width = 4,
+       height = 3,
+       dpi = 300)
+
+ggsave("boxjitter.png",
+       plot = boxplot,
+       device = ragg::agg_png,
+       bg = "transparent",
+       width = 4,
+       height = 3,
+       dpi = 300)
+
+ggsave("scatter.png",
+       plot = scatterplot,
+       device = ragg::agg_png,
+       bg = "transparent",
+       width = 4,
+       height = 3,
        dpi = 300)
 ```
 
