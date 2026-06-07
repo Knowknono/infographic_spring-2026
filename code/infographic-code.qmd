@@ -73,7 +73,7 @@ piechart <- PieDonut(data = pie_clean,
          title = "Social Interaction Percentage by Exercise Type") # added title
 
 # PNG export
-ggsave("pie.png",
+ggsave("exports/pie.png",
        plot = get_last_plot(),
        device = ragg::agg_png,
        bg = "transparent",
@@ -157,7 +157,7 @@ scatterplot <- ggplot(rxntime_scatter,
 print(scatterplot)
 
 # PNG export
-ggsave("scatterplot.png",
+ggsave("exports/scatterplot.png",
        plot = get_last_plot(), # selected plot to save
        device = ragg::agg_png, # supports alpha
        bg = "transparent", # transparent background
@@ -249,7 +249,7 @@ boxplot <- ggplot(data = rxntime_box,
 print(boxplot)
 
 # PNG export
-ggsave("box.png",
+ggsave("exports/box.png",
        plot = get_last_plot(), # selected plot to save
        device = ragg::agg_png, # supports alpha
        bg = "transparent", # transparent background
