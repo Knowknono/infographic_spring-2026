@@ -241,9 +241,9 @@ boxplot <- ggplot(data = rxntime_box,
   scale_color_manual(values = c("Biking" = "slateblue",
                                 "Volleyball" = "dodgerblue",
                                 "Walking" = "lightskyblue")) +
-  # removed grid lines
+  # removed grid and axis lines
   theme(panel.grid = element_blank(),
-        axis.line = element_line(color = "black"))
+        axis.line = element_blank())
 
 # view figure in plots
 print(boxplot)
@@ -262,3 +262,9 @@ ggsave("exports/box.png",
 # Part 4. Write about your process
 
 A classmate on Friday used birds to represent raw data points.
+
+## e.
+
+```{r fig-screenshot, echo=FALSE, out.width='400px'}
+knitr::include_graphics("images/final.png")
+```
