@@ -30,6 +30,18 @@ pie <- readr::read_csv(here::here("data","pie-data.csv"))
 
 # read in my data and saved as object called 'time'
 time <- readr::read_csv(here::here("data","time-data.csv"))
+
+# imported fonts
+# 1st argument: google name, 
+# 2nd name: font name in R
+font_add_google('Lora', 'lora')
+font_add_google('Lobster', 'lobster')
+font_add_google('Anton', 'anton')
+font_add_google('Fira Sans', 'firasans')
+font_add_google('Syne Mono', 'syne')
+
+# enabled showtext font rendering
+showtext_auto()
 ```
 
 # Part 3. Visualizing data
