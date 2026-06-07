@@ -18,11 +18,17 @@ library(here)
 library(webr)
 library(ggimage)
 
+library(dplyr)
+library(ggplot2)
+
 # read in data and saved as object called `rxntime`
 rxntime   <- readr::read_csv(here::here("data","new-data.csv"))
 
 # read in my data and saved as object called 'pie'
 pie <- readr::read_csv(here::here("data","pie-data.csv"))
+
+# read in my data and saved as object called 'time'
+time <- readr::read_csv(here::here("data","time-data.csv"))
 ```
 
 Data last updated on May 29, 2026.
@@ -117,7 +123,7 @@ ggplot(data = rxntime_box,
 
 ^^ add drawing to negative space in the plot
 
-## Timeseries plot
+## Scatter plot
 
 ### Cleaning data
 
@@ -127,7 +133,7 @@ rxntime_clean <- rxntime |>
   # cleaned column names
   clean_names() |> 
   # selected columns of interest
-  select(exercise_duration_min, reaction_time_avg_ms) |> 
+  select(exercise_type, exercise_duration_min, reaction_time_avg_ms) |> 
   # removed missing values
   drop_na()
 ```
@@ -164,6 +170,29 @@ ggplot(data = rxntime_clean,
   # custom colors
   scale_color_manual(values = "dodgerblue")
 ```
+
+```{r}
+img_map <- c(
+  biking = "images/biking.png",
+  volleyball = "images/vb.png",
+  walking = "images/walking.png"
+)
+
+rxntime_clean <- rxntime_clean |> 
+  mutate(exercise_type = as.character(exercise_type),
+         image = img_map[exercise_type])
+```
+
+```{r}
+ggplot(rxntime_clean,
+       aes(x = exercise_duration_min,
+           y = reaction_time_avg_ms)) +
+  geom_image(
+    aes(image = image),
+    size = 0.04,
+    asp = 1)
+```
+
 
 # Part 4. Write about your process
 
