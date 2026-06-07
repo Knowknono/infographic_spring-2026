@@ -17,6 +17,7 @@ library(janitor)
 library(here)
 library(webr)
 library(ggimage)
+library(showtext)
 
 library(dplyr)
 library(ggplot2)
@@ -61,7 +62,7 @@ pie_clean <- pie |>
 piee <- as.data.frame(pie_clean); piee
 
 # created a pie donut chart using the webr package and pie_clean df
-PieDonut(data = pie_clean,
+piechart <- PieDonut(data = pie_clean,
          # pie slices by exercise type, outlined by social interaction
          aes(exercise_type, social_interaction, count = count),
          # outer circle of the pie adds up to 100%
@@ -83,11 +84,13 @@ rxntime_box <- rxntime |>
   # selected columns of interest
   select(exercise_type, reaction_time_avg_ms) |> 
   # changed existing abbreviations
-  mutate(exercise_type = case_when(
+  mutate(case_when(
     exercise_type == "volleyball" ~ "Volleyball",
     exercise_type == "biking" ~ "Biking",
-    exercise_type == "walking" ~ "Walking"
-  )) |> 
+    exercise_type == "walking" ~ "Walking",
+    TRUE ~ as.character(exercise_type))) |> 
+    mutate(image = img_map[exercise_type]) |> 
+ 
   # removed missing values
   drop_na()
 ```
@@ -95,8 +98,14 @@ rxntime_box <- rxntime |>
 ### Visualization
 
 ```{r}
+rxntime_ <- rxntime_clean |> 
+  mutate(exercise_type = as.character(exercise_type),
+         image = img_map[exercise_type])
+```
+
+```{r}
 # base layer: ggplot
-ggplot(data = rxntime_box,
+boxplot <- ggplot(data = rxntime_box,
        # x-axis: exercise type
        # y-axis: mean reaction time
        # color by exercise type
@@ -105,17 +114,22 @@ ggplot(data = rxntime_box,
                      color = exercise_type)) +
   # first layer: boxplot
   geom_boxplot() +
-  # second layer: jitter for raw data
-  geom_jitter(height = 0) +
+  # second layer: icons and jitter
+  geom_image(
+    aes(image = image),
+    position = position_jitter(width = 0.15,
+                               height = 0),
+    size = 0.045,
+    asp = 1) +
   # relabeled x- and y-axes
   labs(x = "Exercise Type",
        y = "Mean Reaction Time (ms)") +
   # removed legend
   theme(legend.position = "none") +
   # custom colors
-  scale_color_manual(values = c("Biking" = "slateblue",
-                                "Volleyball" = "dodgerblue",
-                                "Walking" = "lightskyblue")) +
+  scale_color_manual(values = c("biking" = "slateblue",
+                                "volleyball" = "dodgerblue",
+                                "walking" = "lightskyblue")) +
   # removed grid lines
   theme(panel.grid = element_blank(),
         axis.line = element_line(color = "black"))
@@ -142,7 +156,7 @@ rxntime_clean <- rxntime |>
 
 ```{r}
 # base layer: ggplot
-ggplot(data = rxntime_clean,
+scatterplot <- ggplot(data = rxntime_clean,
        # x-axis: exercise duration in minutes
        # y-axis: average reaction time in milliseconds
        # color
@@ -189,10 +203,20 @@ ggplot(rxntime_clean,
            y = reaction_time_avg_ms)) +
   geom_image(
     aes(image = image),
-    size = 0.04,
-    asp = 1)
+    size = 0.045,
+    asp = 1) +
+  theme_minimal()
 ```
 
+```{r}
+# transparent PNG export
+ggsave("pie.png",
+       plot = piechart,
+       bg = "transparent",
+       width = 8,
+       height = 6,
+       dpi = 300)
+```
 
 # Part 4. Write about your process
 
