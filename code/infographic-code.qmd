@@ -78,13 +78,13 @@ piechart <- PieDonut(data = pie_clean,
 
 # PNG export
 ggsave("C:/github/ENVS-193DS_spring-2026_infographic/exports/pie.png",
-       plot = get_last_plot(),
-       device = ragg::agg_png,
-       bg = "transparent",
-       width = 6,
-       height = 6,
-       units = "in",
-       dpi = 300)
+       plot = get_last_plot(), # selected plot to save
+       device = ragg::agg_png, # supports alpha
+       bg = "transparent", # transparent background
+       width = 4, # adjusted width
+       height = 3, # adjusted height
+       units = "in", # units of plot measurements
+       dpi = 300) # resolution
 ```
 
 ## Scatter plot
@@ -273,6 +273,6 @@ I went with blue because I associate it with vitality. Energy is needed for exer
 
 The donut pie chart was inspired by [The Data Digest](https://www.youtube.com/@TheDataDigest), a YouTuber who uses statistical analysis to discuss Magnus Carlsen's chess matches, TV show endings, and other topics. He created a [tutorial](https://www.youtube.com/watch?v=AHRh4yyHl4g) that I referenced to create my own pie donut.
 
-The box and scatter plots were visualizations we've become familiar with in class, but the icons were inspired by an affective visualization I saw in our last section on Friday. A classmate had used birds to represent raw data points, and the buildings on which the birds sat also represented data points. I wanted to try something similar, at least in terms of adding icons to my figures. For both figures, I cleaned the data and used geom_image to place imported icons onto the plots. The box plot used geom_boxplot.
+The box and scatter plots were visualizations we've become familiar with in class, but the icons were inspired by an affective visualization I saw in our last section on Friday. A classmate had used birds to represent raw data points, and the buildings on which the birds sat also represented their findings. I wanted to try something similar, at the very least by adding icons to my figures. For both plots, I cleaned the data and used geom_image to place imported icons. The box plot required geom_boxplot.
 
-I troubleshooted errors in my code through forums on StackOverflow (I was relieved to see that others had run into the same issues I did and sought help from experts), watched tutorials on YouTube, and read articles (mostly for showtext and the pie donut) in many attempts to make the code work.
+I troubleshooted errors in my code through forums on StackOverflow (others had run into the same issues I did and sought help from experts), watched tutorials on YouTube, and looked up guides on Google (mostly for showtext and the webr pie donut) in attempts to make the code work.
